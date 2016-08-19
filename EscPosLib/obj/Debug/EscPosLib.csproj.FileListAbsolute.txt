@@ -1,0 +1,5 @@
+F:\Projetos\escpos\EscPosLib\bin\Debug\EscPosLib.dll
+F:\Projetos\escpos\EscPosLib\bin\Debug\EscPosLib.pdb
+F:\Projetos\escpos\EscPosLib\obj\Debug\EscPosLib.csprojResolveAssemblyReference.cache
+F:\Projetos\escpos\EscPosLib\obj\Debug\EscPosLib.dll
+F:\Projetos\escpos\EscPosLib\obj\Debug\EscPosLib.pdb
