@@ -19,6 +19,16 @@ namespace Tests
 
         static SerialPort porta = new SerialPort("COM4");
 
+        string NUL = Convert.ToChar(0).ToString();
+        string ESC = Convert.ToChar(27).ToString();
+        string GS = Convert.ToChar(29).ToString();
+        string LF = Convert.ToChar(10).ToString();
+        string CR = Convert.ToChar(13).ToString();
+        string STX = Convert.ToChar(2).ToString();
+        string SOH = Convert.ToChar(1).ToString();
+        string ETX = Convert.ToChar(3).ToString();
+
+
         private EscPos printer; 
 
         //public string conv(int pValor)
@@ -44,9 +54,11 @@ namespace Tests
             //x.testPrint("ElginTextOnly");
 
 
+            printer.sendCommand(new int[] { 12});
+
             //EscPos x = new EscPos(4);
-            int[] command = { 27, 64 };
-            printer.sendCommand(command);
+            
+            
 
         }
 
@@ -391,6 +403,11 @@ namespace Tests
 
             //
 
+
+            //printer.sendCommand(new int[] { 27, 77, 97 });
+            //printer.sendCommand(new int[] { 27, 82, 12, 10 });
+            //printer.sendCommand(new int[] { 27, 116, 3});            
+
             //'////////////////////////////////////////////////////////////////////////////////////////////////
 
             //'-----> Center n = 0 Esquerda - n = 1 meio = n = 3 direita
@@ -405,7 +422,7 @@ namespace Tests
             //Me.MSComm1.Output = Chr$(27) + Chr$(33) + Chr$(0)
             //wEsc(conv(27) + conv(33) + conv(0));
             //command = new int[] { 27, 33, 0 };
-            printer.sendCommand(new int[] { 27, 33, 0 });
+            printer.sendCommand(new int[] { 27, 33, 1 });// 1 (Fonte menor), 0 (Fonte maior) 
 
             //'-----> Definição do espaçamento entre linhas (Intervalo 0 <= n <= 255)
 
@@ -429,7 +446,7 @@ namespace Tests
 
             //Me.MSComm1.Output = " Elgin S/A Relacionamento com Software House" + Chr$(&HA)
             //wEsc(" Elgin S/A Relacionamento com Software House" + conv(0xA));
-            printer.PrintLine("Elgin S/A Relacionamento com Software House");
+            printer.PrintLine("Elgin S/A Relacionamento com Software House é");
 
             //wEsc(conv(0x1B) + conv(0x12));
             //command = new int[] { 27, 18 };
@@ -460,7 +477,7 @@ namespace Tests
 
             //Me.MSComm1.Output = "Rua Barao de Campinas, 305, Centro, Sao Paulo, SP" + Chr$(&HA)
             //wEsc("Rua Barao de Campinas, 305, Centro, Sao Paulo, SP" + conv(0xA));
-            printer.PrintLine("Rua Barao de Campinas, 305, Centro, Sao Paulo, SP");
+            printer.PrintLine("Rua Barão de Campinasç, 305, Centro, Sao Paulo, SP");
 
             //'-----> Center n = 0 Esquerda - n = 1 meio = n = 3 direita
 
@@ -473,10 +490,64 @@ namespace Tests
 
             //Me.MSComm1.Output = "------------------------------------------------" + Chr$(&HA)
             //wEsc("------------------------------------------------" + conv(0xA));
+            printer.sendCommand(new int[] { 27, 33, 32 });// 1 (Fonte menor), 0 (Fonte maior)
             printer.PrintLine("------------------------------------------------");
-
+            printer.sendCommand(new int[] { 27, 33, 0 });// 1 (Fonte menor), 0 (Fonte maior)
 
             printer.PrintDoubleLine("Banana");
+
+
+
+            //'////////////////////////////////////////////////////////////////////////////////////////////////
+
+            //'Impressão do CODE 128
+
+            //'-----> Center n = 0 Esquerda - n = 1 meio = n = 3 direita
+            //MSComm1.Output = Chr$(&H1B) + Chr$(&H61) + Chr$(1) + Chr$(&HA)
+            printer.sendCommand(new int[] { 27, 97, 1, 10 });
+
+            //'-----> Definir a largura do código de barras
+            //MSComm1.Output = Chr$(&H1D) + "w" + Chr$(1)
+            printer.sendCommand(new int[] { 29, 119, 1 });
+
+            //'-----> Seleccione a posição de impressão de caracteres HRI
+            //MSComm1.Output = Chr$(&H1D) + "H" + Chr$(2)
+            printer.sendCommand(new int[] { 29, 72, 1 });
+
+            //'-----> Fonte dos Caracteres
+            //MSComm1.Output = Chr$(&H1D) + "f" + Chr$(48)
+            //printer.sendCommand(new int[] { 29, 102, 1 });
+
+            //'-----> Definir a altura do código de barras
+            //MSComm1.Output = Chr$(&H1D) + "h" + Chr$(50)
+            printer.sendCommand(new int[] { 29, 104, 60 });
+
+            //'-----> Imprimir codito de barras com modelo correspondente
+            //MSComm1.Output = Chr$(&H1D) + "k" + Chr$(73) + Chr$(50) + Chr$(123) + Chr$(66)
+            //printer.sendCommand(new int[] { 29, 107, 73, 46, 123, 67 });
+            printer.sendCommand(Convert.ToChar(29).ToString() +
+                                 Convert.ToChar(107).ToString() +
+                                 Convert.ToChar(73).ToString() +
+                                 Convert.ToChar(13).ToString() +
+                                 "{C1234567890123");
+            
+
+            printer.sendCommand(new int[] { 10 });
+
+                                 
+
+            //MSComm1.Output = "123456789012345678901234567890123456789012345678" + Chr$(&HA)
+            //printer.sendCommand("12345678901234567890123456789012345678901234");
+
+            //'-----> Deixa o texto em negrito: 1 para negrito e 0 para ficar sem negrito
+
+            //MSComm1.Output = Chr$(&H1B) + Chr$(&H64) + Chr$(1)
+            printer.sendCommand(new int[] { 27, 100, 1 });
+
+            //'-----> Avançar uma linha
+
+            //MSComm1.Output = Chr$(&HA)
+            printer.sendCommand(new int[] { 10 });
 
 
             //Avança uma linha
@@ -497,6 +568,21 @@ namespace Tests
             //wEsc(conv(27) + conv(105));
             //command = new int[] { 27, 105 };
             printer.sendCommand(new int[] { 27, 105 });
+
+
+            printer.FechaPorta();
+
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            printer.ControleAutomaticoDePorta = false;
+
+
+            printer.AbrePorta();
+
+
+            printer.Barcode("35160808723218000186599000048110005992368575", 73);
 
 
             printer.FechaPorta();
