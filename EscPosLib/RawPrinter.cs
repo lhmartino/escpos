@@ -55,7 +55,13 @@ namespace EscPosLib
             bool bSuccess = false; // Assume failure unless you specifically succeed.
 
             di.pDocName = "i9 RAW Document";
+
+            //Win 7
             di.pDataType = "RAW";
+
+            //Win8+
+            //di.pDataType = "XPS_PASS";
+
 
             // Open the printer.
             if (OpenPrinter(szPrinterName.Normalize(), out hPrinter, IntPtr.Zero))

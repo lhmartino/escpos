@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace EscPosLib.Elgin
 {
-    class EscPos
+    public class EscPos
     {
 
         //if you want to use decimal values in your methods.
@@ -45,9 +45,6 @@ namespace EscPosLib.Elgin
             byte[] byteData = brazilian.GetBytes(data);
 
             RawPrinterHelper.SendBytesToPrinter(szPrinterName, byteData);
-
-
-
 
             return true;
         }
@@ -188,7 +185,6 @@ namespace EscPosLib.Elgin
             RawPrinterHelper.SendBytesToPrinter(szPrinterName, intTobyte(char_set));
 
             return true;
-
 
         }
 
