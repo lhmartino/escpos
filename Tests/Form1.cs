@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -729,42 +730,36 @@ namespace Tests
 
         private void CodigoDeBarrasSAT2(string pCodBarras)
         {
-            
-            Encoding m_encoding = Encoding.GetEncoding("iso-8859-1");
-            porta.Encoding = m_encoding;
-
-            byte[] invalidData = m_encoding.GetBytes(pCodBarras);
-            int[] bytesAsInts = invalidData.Select(x => (int)x).ToArray();
 
             
-            string vCod = m_encoding.GetString(invalidData);
+            int vCount = 1;
+            int k = 0;
+            string vCodeAux = "";
+            int[] vCmdCodigo = new int[pCodBarras.Length / 2];
 
-            MessageBox.Show(bytesAsInts.Length.ToString());
-            MessageBox.Show(vCod);
+            //Decompõe código em "strings" de dois caracteres e insere no array
+            foreach (char c in pCodBarras)
+            {
+                vCodeAux += c.ToString();
 
-            //Example data for printing "No. 123456"
-            //GS k 73 10 123 66 78 111 46 123 67 12 34 56
-            //sendCommand(new int[] {29, 107, 73, 10, 123, 66, 78, 111, 46, 123, 67, 12, 34, 56});
+                if(vCount == 2){                    
+                    vCmdCodigo[k] = Convert.ToInt32(vCodeAux);
+                    vCodeAux = "";
+                    vCount = 0;
+                    k++;
+                }
 
-            /*
-                In this example, the printer first prints "No." using Code B, then prints the following numbers using Code C.
-             * Heres's what I know about this example - 
-             * the GS stands for "Group Separation" and is coded as Chr(29) and the "k" (Chr(107)) combined with GS is 
-             * supposed to tell the printer it will be printing a bar code.  "73" is for CODE 128 and the 10 is for the 
-             * number of characters in the bar code (No. 123456) = 10.  Then "123 66" tells the printer to print using 
-             * CODE B the next three characters (N = 78, o = 111 and . = 46).  Next "123 67" tells the printer to print 
-             * using CODE C the numbers 123456.
-             */
-
+                vCount++;
+            }
+          
+            printer.sendCommand(new int[] { 27, 33, 1 }); //Condensa
             printer.sendCommand(new int[] { 29, 104, 81 }); //Altura. Padrão 162            
-            printer.sendCommand(new int[] { 29, 119, 1 }); // "grossura" das barras
-            printer.sendCommand(new int[] { 29, 107, 73, bytesAsInts.Length+2, 123, 65 });   // Code 128, padrão "B" (66)
-            //PrintLine("3516080872321800018659");
-            printer.PrintLine(vCod);
-
-           
-
-            //sendCommand(new int[] { 0 });
+            printer.sendCommand(new int[] { 27, 33, 1 }); //Condensa
+            printer.sendCommand(new int[] { 29, 119, 2 }); // "grossura" das barras
+            printer.sendCommand(new int[] { 27, 33, 1 }); //Condensa
+            printer.sendCommand(new int[] { 29, 107, 73, (pCodBarras.Length/2)+2, 123, 67 });   // Code 128, padrão "C" (67)
+            
+            printer.sendCommand(vCmdCodigo);            
 
         }
 
